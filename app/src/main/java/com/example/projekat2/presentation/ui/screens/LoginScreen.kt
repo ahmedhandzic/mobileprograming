@@ -1,4 +1,4 @@
-package com.example.projekat2.util.screens
+package com.example.projekat2.presentation.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,11 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.projekat2.util.components.*
+import androidx.navigation.NavController
+import com.example.projekat2.presentation.navigation.Screen
+import com.example.projekat2.presentation.ui.components.Title
 
 @Composable
-fun LoginScreen() {
-
+fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -29,7 +30,6 @@ fun LoginScreen() {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Polje za Email
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -39,7 +39,6 @@ fun LoginScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Polje za Lozinku
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -50,10 +49,15 @@ fun LoginScreen() {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Dugme
         Button(
-            onClick = {  },
-            modifier = Modifier.fillMaxWidth().height(50.dp),
+            onClick = {
+                navController.navigate(Screen.Dashboard.route) {
+                    popUpTo(Screen.Login.route) { inclusive = true }
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
         ) {
             Text("Prijavi se", color = Color.White)

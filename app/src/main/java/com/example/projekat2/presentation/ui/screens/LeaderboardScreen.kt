@@ -1,4 +1,4 @@
-package com.example.projekat2.util.screens
+package com.example.projekat2.presentation.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,12 +18,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import androidx.navigation.NavController
 
 data class LeaderboardPlayer(val name: String, val xp: Int)
 
 @Composable
-fun LeaderboardScreen() {
+fun LeaderboardScreen(navController: NavController) {
     val players = listOf(
         LeaderboardPlayer("Tarik", 540),
         LeaderboardPlayer("Lejla", 480),
