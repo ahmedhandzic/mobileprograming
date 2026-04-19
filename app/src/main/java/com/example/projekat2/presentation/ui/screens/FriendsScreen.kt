@@ -1,6 +1,7 @@
-package com.example.projekat2.util.screens
+package com.example.projekat2.presentation.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,6 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -16,30 +19,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-
-data class FriendIdea(val name: String, val idea: String)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.projekat2.model.FriendIdea
+import com.example.projekat2.presentation.navigation.Screen
+import com.example.projekat2.presentation.viewmodel.FriendsViewModel
 
 @Composable
-fun FriendsScreen() {
-    val friendsList = listOf(
-        FriendIdea("Tarik", "Nauči 10 riječi na španskom"),
-        FriendIdea("Lejla", "Napiši priču o svemiru"),
-        FriendIdea("Kenan", "Napravi plan treninga za sedmicu"),
-        FriendIdea("Emina", "Nacrtaj portret kućnog ljubimca"),
-        FriendIdea("Adnan", "Slušaj podcast o historiji Rima"),
-        FriendIdea("Sara", "Spremi novo jelo od samo 5 sastojaka")
-    )
+fun FriendsScreen(
+    navController: NavController,
+    viewModel: FriendsViewModel = viewModel()
+) {
+
+    val friendsList by viewModel.friendsState.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-
             .background(Color(0xFFFFEBEE))
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Text(
             text = "Ideje Prijatelja",
             fontSize = 28.sp,
@@ -54,18 +54,29 @@ fun FriendsScreen() {
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 16.dp)
         ) {
-            items(friendsList) { friend ->
-                FriendCard(friend)
-                Spacer(modifier = Modifier.height(12.dp))
+
+            if (friendsList.isEmpty()) {
+                item {
+                    Text("No items available", color = Color.Gray, modifier = Modifier.padding(16.dp))
+                }
+            } else {
+                items(friendsList) { friend ->
+                    FriendCard(friend = friend, onClick = {
+                        navController.navigate(Screen.Details.createRoute(friend.id, friend.name))
+                    })
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
             }
         }
     }
 }
 
 @Composable
-fun FriendCard(friend: FriendIdea) {
+fun FriendCard(friend: FriendIdea, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = Color.Red)
     ) {
         Row(

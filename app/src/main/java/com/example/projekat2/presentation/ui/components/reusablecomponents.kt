@@ -1,4 +1,4 @@
-package com.example.projekat2.util.components
+package com.example.projekat2.presentation.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
