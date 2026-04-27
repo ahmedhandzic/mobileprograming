@@ -1,3 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">projekat2</string>
+    <string name="quests">Quests</string>
+    <string name="add_quest">Add Quest</string>
+    <string name="delete_quest">Delete Quest</string>
 </resources>
