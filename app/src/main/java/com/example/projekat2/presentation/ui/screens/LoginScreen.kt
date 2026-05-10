@@ -25,6 +25,8 @@ fun LoginScreen(navController: NavController) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
+
+
     ) {
         Title(title = "Prijava")
 
@@ -63,4 +65,19 @@ fun LoginScreen(navController: NavController) {
             Text("Prijavi se", color = Color.White)
         }
     }
+
+
+    Spacer(modifier = Modifier.height(24.dp))
+    Divider(color = Color.LightGray, thickness = 1.dp)
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+        text = "Application dev: Ahmed Handžić",
+        style = MaterialTheme.typography.bodySmall,
+        color = Color.Gray,
+        modifier = Modifier.padding(bottom = 16.dp)
+    )
+
 }
+
+
+

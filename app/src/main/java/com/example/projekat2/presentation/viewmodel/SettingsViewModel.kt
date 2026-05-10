@@ -17,3 +17,4 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
         _uiState.value = _uiState.value.copy(isDarkMode = enabled)
     }
 }
+
