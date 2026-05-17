@@ -4,35 +4,40 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-
-data class LeaderboardPlayer(val name: String, val xp: Int)
+import com.example.projekat2.presentation.state.LeaderboardUiState
+import com.example.projekat2.presentation.ui.screens.leaderboard.components.LeaderboardCard
+import com.example.projekat2.presentation.viewmodel.LeaderboardViewModel
 
 @Composable
-fun LeaderboardScreen(navController: NavController) {
-    val players = listOf(
-        LeaderboardPlayer("Tarik", 540),
-        LeaderboardPlayer("Lejla", 480),
-        LeaderboardPlayer("Ja", 320),
-        LeaderboardPlayer("Kenan", 290),
-        LeaderboardPlayer("Emina", 150),
-        LeaderboardPlayer("Adnan", 90)
-    )
+fun LeaderboardScreen(
+    navController: NavController,
+    viewModel: LeaderboardViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val rankedPlayers by viewModel.rankedPlayers.collectAsState()
 
+    val effectiveUiState = when (uiState) {
+        is LeaderboardUiState.Success -> LeaderboardUiState.Success(rankedPlayers)
+        else -> uiState
+    }
+
+    LeaderboardScreenContent(uiState = effectiveUiState)
+}
+
+@Composable
+fun LeaderboardScreenContent(uiState: LeaderboardUiState) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,87 +56,29 @@ fun LeaderboardScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 16.dp)
-        ) {
-            itemsIndexed(players) { index, player ->
-                val rank = index + 1
-                LeaderboardCard(rank = rank, player = player)
-                Spacer(modifier = Modifier.height(12.dp))
+        when (uiState) {
+            LeaderboardUiState.Init, LeaderboardUiState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Color(0xFFB71C1C))
+                }
             }
-        }
-    }
-}
-
-
-@Composable
-fun LeaderboardCard(rank: Int, player: LeaderboardPlayer) {
-    val isMe = player.name == "Ti (Ja)"
-    val cardColor = if (isMe) Color(0xFFB71C1C) else Color.Red
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = cardColor)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (rank <= 3) {
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = "Top 3",
-                    tint = Color(0xFFFFD700),
-                    modifier = Modifier.size(32.dp)
-                )
-            } else {
-                Text(
-                    text = "#$rank",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    modifier = Modifier.width(32.dp)
-                )
+            is LeaderboardUiState.Error -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = uiState.message, color = Color(0xFFB71C1C))
+                }
             }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.2f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
+            is LeaderboardUiState.Success -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 16.dp)
+                ) {
+                    itemsIndexed(uiState.players) { index, player ->
+                        val rank = index + 1
+                        LeaderboardCard(rank = rank, player = player)
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                }
             }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Text(
-                text = player.name,
-                color = Color.White,
-                fontWeight = if (isMe) FontWeight.ExtraBold else FontWeight.Bold,
-                fontSize = 18.sp,
-                modifier = Modifier.weight(1f)
-            )
-
-
-            Text(
-                text = "${player.xp} XP",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
         }
     }
 }
